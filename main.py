@@ -60,10 +60,8 @@ def parse_book_page(book_id, page):
     book_comments = [comment.find('span', class_='black').text for comment in soup.find_all('div', class_='texts')]
         
     filename = f'{sanitize_filename(book_title)}-{sanitize_filename(book_author)}'
-    txt_url = f'https://tululu.org/txt.php' #?id={book_id} 
         
     return {'filename':filename,
-            'txt_url': txt_url,
             'book_image':book_image,
             'book_genres':book_genres,
             'book_comments':book_comments}
@@ -81,7 +79,7 @@ def download_books(start_id, end_id):
             parsed_page = parse_book_page(book_id, response)
             book_filename = f'{parsed_page["filename"]}.txt'
             image_filename = f'{parsed_page["filename"]}'
-            txt_url = parsed_page['txt_url']
+            txt_url = 'https://tululu.org/txt.php'
             image_url = parsed_page['book_image']
             download_txt(txt_url, book_filename, book_id)
             download_image(image_url, image_filename)            
