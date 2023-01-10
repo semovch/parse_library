@@ -22,17 +22,13 @@ def download_txt(url, filename, book_id, folder='books'):
         
         os.makedirs(folder, exist_ok=True)
            
-        try: 
-            params = {'id':book_id}
-            response = requests.get(url, params=params)  
-            response.raise_for_status()
-            check_for_redirect(response)
-            with open(os.path.join(folder, filename), 'wb') as file:
-                file.write(response.content)
-        except HTTPError as err:
-            print(f'No book: {err}')
-        except ConnectionError as err:
-            print(f'No connection: {err}') 
+        params = {'id':book_id}
+        response = requests.get(url, params=params)  
+        response.raise_for_status()
+        check_for_redirect(response)
+        with open(os.path.join(folder, filename), 'wb') as file:
+            file.write(response.content)
+
         return os.path.join(folder, filename)    
 
 
@@ -42,16 +38,12 @@ def download_image(url, filename, folder='images'):
 
         os.makedirs(folder, exist_ok=True)
         
-        try:
-            response = requests.get(url)   
-            response.raise_for_status()
-            check_for_redirect(response)
-            with open(os.path.join(folder, filename), 'wb') as file:
-                file.write(response.content)
-        except HTTPError as err:
-            print(f'No image: {err}')
-        except ConnectionError as err:
-            print(f'No connection: {err}')     
+        response = requests.get(url)   
+        response.raise_for_status()
+        check_for_redirect(response)
+        with open(os.path.join(folder, filename), 'wb') as file:
+            file.write(response.content)
+            
         return os.path.join(folder, filename)        
       
                            
@@ -92,9 +84,10 @@ def download_books(start_id, end_id):
             download_txt(txt_url, book_filename, book_id)
             download_image(image_url, image_filename)            
         except requests.exceptions.HTTPError as err:
-            print(f'No page: {err}')   
+            print(f'No resource: {err}')   
         except requests.exceptions.ConnectionError as err:
             print(f'No connection: {err}')       
+
        
 def main():
     parser = argparse.ArgumentParser(
@@ -109,8 +102,5 @@ def main():
        
     
 if __name__ == '__main__':
-    main()        
+    main()   
   
-    
-   
-    
