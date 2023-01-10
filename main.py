@@ -22,31 +22,31 @@ def check_for_redirect(response):
         
 def download_txt(url, filename, book_id, folder='books'):        
         
-        os.makedirs(folder, exist_ok=True)
+    os.makedirs(folder, exist_ok=True)
            
-        params = {'id':book_id}
-        response = requests.get(url, params=params)  
-        response.raise_for_status()
-        check_for_redirect(response)
-        with open(os.path.join(folder, filename), 'wb') as file:
-            file.write(response.content)
+    params = {'id':book_id}
+    response = requests.get(url, params=params)  
+    response.raise_for_status()
+    check_for_redirect(response)
+    path_to_file = os.path.join(folder, filename)
+    with open(path_to_file, 'wb') as file:
+        file.write(response.content)
 
-        return os.path.join(folder, filename)    
+    return path_to_file
 
 
 def download_image(url, filename, folder='images'):    
-    
-    if url != 'https://tululu.org/images/nopic.gif':        
-
-        os.makedirs(folder, exist_ok=True)
+          
+    os.makedirs(folder, exist_ok=True)
         
-        response = requests.get(url)   
-        response.raise_for_status()
-        check_for_redirect(response)
-        with open(os.path.join(folder, filename), 'wb') as file:
-            file.write(response.content)
+    response = requests.get(url)   
+    response.raise_for_status()
+    check_for_redirect(response)
+    path_to_file = os.path.join(folder, filename)
+    with open(path_to_file, 'wb') as file:
+        file.write(response.content)
             
-        return os.path.join(folder, filename)        
+    return path_to_file       
       
                            
 def parse_book_page(book_id, page):  
@@ -71,7 +71,7 @@ def download_books(start_id, end_id):
     for book_id in range(start_id, end_id+1):
         
         book_url = f'https://tululu.org/b{book_id}/'
-       
+        
         try: 
             response = requests.get(book_url)
             response.raise_for_status()
@@ -82,7 +82,8 @@ def download_books(start_id, end_id):
             txt_url = 'https://tululu.org/txt.php'
             image_url = parsed_page['book_image']
             download_txt(txt_url, book_filename, book_id)
-            download_image(image_url, image_filename)            
+            if image_url != 'https://tululu.org/images/nopic.gif':
+                download_image(image_url, image_filename)            
         except requests.exceptions.HTTPError as err:
             print(f'No resource: {err}')   
         except requests.exceptions.ConnectionError as err:
