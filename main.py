@@ -2,6 +2,8 @@ import requests
 
 import os
 
+import time
+
 import argparse
 
 from bs4 import BeautifulSoup
@@ -86,6 +88,7 @@ def download_books(start_id, end_id):
         except requests.exceptions.HTTPError as err:
             print(f'No resource: {err}')   
         except requests.exceptions.ConnectionError as err:
+            time.sleep(10)
             print(f'No connection: {err}')       
 
        
