@@ -76,7 +76,7 @@ def main():
     skip_txt = args.skip_txt
     dest_folder = args.dest_folder
     
-    for page in range(start_page, end_page):
+    for page in range(start_page, end_page+1):
         url_of_genre = f'https://tululu.org/l{genre_id}/{page}/'
         page = requests.get(url_of_genre)
         page.raise_for_status()
