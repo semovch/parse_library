@@ -1,17 +1,11 @@
 import requests
-
 import os
-
 import time
-
 import argparse
 
 from bs4 import BeautifulSoup
-
 from urllib.parse import urljoin
-
 from requests.exceptions import HTTPError, ConnectionError
-
 from pathvalidate import sanitize_filename
 
 
@@ -36,35 +30,40 @@ def download_txt(url, filename, book_id, folder='books'):
 
 
 def download_image(url, filename, folder='images'):    
+    if url != 'https://tululu.org/images/nopic.gif':
           
-    os.makedirs(folder, exist_ok=True)
+        os.makedirs(folder, exist_ok=True)
         
-    response = requests.get(url)   
-    response.raise_for_status()
-    check_for_redirect(response)
-    path_to_file = os.path.join(folder, filename)
-    with open(path_to_file, 'wb') as file:
-        file.write(response.content)
+        response = requests.get(url)   
+        response.raise_for_status()
+        check_for_redirect(response)
+        path_to_file = os.path.join(folder, filename)
+        with open(path_to_file, 'wb') as file:
+            file.write(response.content)
             
-    return path_to_file       
+        return path_to_file       
       
                            
-def parse_book_page(book_id, page):  
+def parse_book_page(page):  
     
     soup = BeautifulSoup(page.text, 'lxml')
     
     book_title = soup.find('div', {"id": "content"}).find('h1').next[:-8]
     book_author = soup.find('div', {"id": "content"}).find('a').text
-    book_image = urljoin(page.url, soup.find('div', class_='bookimage').find('img')['src'])
-    book_genres = [genre.text for genre in soup.find('span', class_='d_book').find_all('a')]
-    book_comments = [comment.find('span', class_='black').text for comment in soup.find_all('div', class_='texts')]
+    book_image = urljoin(page.url, soup.select_one('div.bookimage img').get('src'))
+    image_src = soup.select_one('div.bookimage img').get('src')
+    book_genres = [genre.text for genre in soup.select('span.d_book a')]
+    book_comments = [item.text for item in soup.select('div.texts span.black')]
         
     filename = f'{sanitize_filename(book_title)}-{sanitize_filename(book_author)}'
         
-    return {'filename':filename,
-            'book_image':book_image,
-            'book_genres':book_genres,
-            'book_comments':book_comments}
+    return {'filename': filename,
+            'book_title': book_title,
+            'book_author': book_author,
+            'book_image': book_image,
+            'image_src': image_src,
+            'book_genres': book_genres,
+            'book_comments': book_comments}
 
     
 def download_books(start_id, end_id):
@@ -76,7 +75,7 @@ def download_books(start_id, end_id):
             response = requests.get(book_url)
             response.raise_for_status()
             check_for_redirect(response)
-            parsed_page = parse_book_page(book_id, response)
+            parsed_page = parse_book_page(response)
             book_filename = f'{parsed_page["filename"]}.txt'
             image_filename = f'{parsed_page["filename"]}'
             txt_url = 'https://tululu.org/txt.php'
