@@ -30,18 +30,17 @@ def download_txt(url, filename, book_id, folder='books'):
 
 
 def download_image(url, filename, folder='images'):    
-    if url != 'https://tululu.org/images/nopic.gif':
-          
-        os.makedirs(folder, exist_ok=True)
+    
+    os.makedirs(folder, exist_ok=True)
         
-        response = requests.get(url)   
-        response.raise_for_status()
-        check_for_redirect(response)
-        path_to_file = os.path.join(folder, filename)
-        with open(path_to_file, 'wb') as file:
-            file.write(response.content)
+    response = requests.get(url)   
+    response.raise_for_status()
+    check_for_redirect(response)
+    path_to_file = os.path.join(folder, filename)
+    with open(path_to_file, 'wb') as file:
+        file.write(response.content)
             
-        return path_to_file       
+    return path_to_file       
       
                            
 def parse_book_page(page):  
